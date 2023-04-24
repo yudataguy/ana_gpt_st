@@ -1,4 +1,3 @@
-import json
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
 from llama_index import (
@@ -101,20 +100,26 @@ if "generated" not in st.session_state:
 if "past" not in st.session_state:
     st.session_state["past"] = []
 
-
-def get_input() -> str:
-    """Get user input from the text input box."""
-    input_text = st.text_input("何を聞きたいですか？", key="input")
-    return input_text
+if "input" not in st.session_state:
+    st.session_state["input"] = ""
 
 
-user_input = get_input()
+# def get_input() -> str:
+#     """Get user input from the text input box."""
+#     input_text = st.text_input("何を聞きたいですか？", key="input")
+#     return input_text
 
-if user_input:
-    output = generate_response(user_input)
-    # print(type(output))
-    st.session_state.past.append(user_input)
-    st.session_state.generated.append(output.response)
+
+def submit():
+    st.session_state.input = st.session_state.widget
+    if st.session_state.input:
+        output = generate_response(st.session_state.input)
+        st.session_state.past.append(st.session_state.input)
+        st.session_state.generated.append(output.response)
+        st.session_state.widget = ""
+
+
+st.text_input("何を聞きたいですか？", key="widget", on_change=submit)
 
 
 if st.session_state["generated"]:
